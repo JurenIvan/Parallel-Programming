@@ -1,12 +1,18 @@
 #!/bin/bash
-# export MPJ_HOME=/Users/ivanjuren/Library/mpj-v0_44
-echo "javac version:"
+
+if [ $# -eq 0 ]
+  then
+    echo "No arguments supplied"
+    exit
+fi
+
+export MPJ_HOME=/Users/ivanjuren/Library/mpj-v0_44
 javac -version
-echo "java version :"
 java -version
 
-javac -cp $MPJ_HOME/lib/mpj.jar DrunkPhilosophers/src/main/java/hr/fer/zemris/Main.java -d DrunkPhilosophers/build/classes/java/main
-echo 'compiled'
-cd DrunkPhilosophers/build/classes/java/main
-echo 'running'
-$MPJ_HOME/bin/mpjrun.sh -np $1 hr.fer.zemris.Main
+echo 'Compiling...'
+javac -cp $MPJ_HOME/lib/mpj.jar DrunkPhilosophers/src/main/java/hr/fer/zemris/Philosopher.java -d DrunkPhilosophers/build/classes/java/main
+echo 'Compiled!'
+cd DrunkPhilosophers/build/classes/java/main || echo "FAILED!!!"
+echo 'running ...'
+$MPJ_HOME/bin/mpjrun.sh -np $1 hr.fer.zemris.Philosopher
