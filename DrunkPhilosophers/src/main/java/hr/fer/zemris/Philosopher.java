@@ -33,11 +33,11 @@ public class Philosopher {
         initEnvironment();
 
         think();
-        System.out.println(rank + " WANTS TO EAT");
+        System.out.println(rank + " ".repeat(rank) + " WANTS TO EAT");
         Side missingFork = getMissingForkSide();
         while (missingFork != null) {
             if (FORKS.get(missingFork) == NON_EXISTENT) {
-                System.out.println(rank + " WANTS " + missingFork);
+                System.out.println(rank + " ".repeat(rank) + " WANTS " + missingFork);
 
                 MPI.COMM_WORLD.Isend(EMPTY, 0, 0, MPI.CHAR, NEIGHBOURS.get(missingFork), BEG_FOR_FORK);
                 FORKS.put(missingFork, ASKED_BUT_NO_ANSWER);
@@ -66,7 +66,7 @@ public class Philosopher {
         for (var side : Side.values()) {
             if (!REQUESTS.get(side)) continue;
             FORKS.put(side, NON_EXISTENT);
-//            System.out.println(rank + " DELAYED REPLY " + side);
+            System.out.println(rank + " ".repeat(rank) + " DELAYED REPLY " + side);
             MPI.COMM_WORLD.Isend(EMPTY, 0, 0, MPI.CHAR, NEIGHBOURS.get(side), GRANT_FORK);
             REQUESTS.put(side, false);
         }
@@ -91,10 +91,10 @@ public class Philosopher {
         }
         if (message.tag == BEG_FOR_FORK) {
             if (FORKS.get(neighbour) == CLEAN) {
-                System.out.println(rank + " NOTICE REQUEST " + neighbour);
+                System.out.println(rank + " ".repeat(rank) + " NOTICE REQUEST " + neighbour);
                 REQUESTS.put(neighbour, true);
             } else if (FORKS.get(neighbour) == DIRTY) {
-                System.out.println(rank + " INSTANT GRANT " + neighbour);
+                System.out.println(rank + " ".repeat(rank) + " INSTANT GRANT " + neighbour);
                 FORKS.put(neighbour, NON_EXISTENT);
                 MPI.COMM_WORLD.Isend(EMPTY, 0, 0, MPI.CHAR, message.source, GRANT_FORK);
             }
@@ -109,13 +109,13 @@ public class Philosopher {
     }
 
     private static void eat() {
-        System.out.println(rank + " EATING!");
+        System.out.println(rank + " ".repeat(rank) + " EATING!");
         FORKS.put(LEFT, DIRTY);
         FORKS.put(RIGHT, DIRTY);
     }
 
     private static void think() throws InterruptedException {
-        System.out.println(rank + " THINKING");
+        System.out.println(rank + " ".repeat(rank) + " THINKING");
         var sleepLen = randomNumberInRange();
         for (int i = 0; i < sleepLen; i += CHECK_FOR_REQUEST_INTERVAL) {
             sleep(CHECK_FOR_REQUEST_INTERVAL);
@@ -141,11 +141,7 @@ public class Philosopher {
         return round(random() * (10000 - 1000)) + 1000;
     }
 
-    public enum ForkState {
-        NON_EXISTENT, ASKED_BUT_NO_ANSWER, DIRTY, CLEAN
-    }
+    public enum ForkState {NON_EXISTENT, ASKED_BUT_NO_ANSWER, DIRTY, CLEAN}
 
-    public enum Side {
-        LEFT, RIGHT
-    }
+    public enum Side {LEFT, RIGHT}
 }
